@@ -1,0 +1,219 @@
+const english60Data = {
+    "totalDays": 60,
+    "currentDay": 1, // Có thể cập nhật động
+    "lessons": [
+      {
+        "day": 1,
+        "phase": 1,
+        "title": "Ngày 1: Chào hỏi & Âm cơ bản",
+        "focus": "Pronunciation + Basic Greetings",
+        "sessions": [
+          {
+            "id": "d1-s1",
+            "time": "0-15",
+            "skill": "Pronunciation",
+            "title": "Basic Vowel Sounds",
+            "description": "Học và luyện 5 nguyên âm cơ bản",
+            "resources": [
+              {
+                "type": "youtube",
+                "url": "https://www.youtube.com/watch?v=p1SRYnumsBE",
+                "title": "Rachel's English - Vowel Sounds",
+                "duration": "12 min"
+              }
+            ],
+            "task": "Shadowing 3 lần theo video"
+          },
+          {
+            "id": "d1-s2",
+            "time": "15-35",
+            "skill": "Vocabulary + Grammar",
+            "title": "Greetings & Introduction",
+            "description": "Học 12 từ/cụm từ chào hỏi",
+            "resources": [
+              {
+                "type": "website",
+                "url": "https://learnenglish.britishcouncil.org/beginner-grammar/greetings",
+                "title": "British Council - Greetings"
+              }
+            ],
+            "vocab": ["hello", "hi", "good morning", "good afternoon", "good evening", "nice to meet you", "my name is", "thank you", "please", "yes", "no", "sorry"],
+            "grammar": ["to be (am/is/are)"],
+            "task": "Viết và nói to 8 câu chào hỏi"
+          },
+          {
+            "id": "d1-s3",
+            "time": "35-55",
+            "skill": "Listening",
+            "title": "Simple Listening Practice",
+            "resources": [
+              {
+                "type": "youtube",
+                "url": "https://www.youtube.com/watch?v=YAsDeXcYyTg",
+                "title": "BBC 6 Minute English - First Lesson",
+                "duration": "6 min"
+              }
+            ],
+            "task": "Nghe 2 lần, ghi chú 5 từ mới"
+          },
+          {
+            "id": "d1-s4",
+            "time": "55-75",
+            "skill": "Speaking",
+            "title": "Shadowing & Self-introduction",
+            "task": "Ghi âm giới thiệu bản thân 20-30 giây"
+          },
+          {
+            "id": "d1-s5",
+            "time": "75-90",
+            "skill": "Reading + Writing",
+            "title": "Basic Reading",
+            "resources": [
+              {
+                "type": "website",
+                "url": "https://learnenglish.britishcouncil.org/beginner-reading/a1-reading",
+                "title": "A1 Reading - Meeting people"
+              }
+            ],
+            "task": "Đọc bài ngắn + viết 5 câu giới thiệu"
+          }
+        ],
+        "immersion": [
+          "Đổi ngôn ngữ điện thoại sang English",
+          "Nghe 1 bài hát tiếng Anh có lyrics",
+          "Self-talk: Mô tả những gì bạn đang làm"
+        ],
+        "dailyVocabCount": 12
+      },
+      {
+        "day": 2,
+        "phase": 1,
+        "title": "Ngày 2: Số đếm & Màu sắc",
+        "focus": "Numbers & Colors",
+        "sessions": [
+          {
+            "id": "d2-s1",
+            "time": "0-15",
+            "skill": "Pronunciation",
+            "title": "Consonant Sounds",
+            "resources": [
+              { "type": "youtube", "url": "https://www.youtube.com/watch?v=8J8w8f8f8f8", "title": "Rachel's English - Consonants" }
+            ],
+            "task": "Shadowing 10 từ khó phát âm"
+          },
+          {
+            "id": "d2-s2",
+            "time": "15-35",
+            "skill": "Vocabulary + Grammar",
+            "title": "Numbers & Colors",
+            "vocab": ["one", "two", "three", "four", "five", "red", "blue", "green", "yellow", "black", "white", "how many"],
+            "grammar": ["This is / That is", "Question words (What, How)"],
+            "task": "Luyện đếm 1-20 + tên màu"
+          },
+          {
+            "id": "d2-s3",
+            "time": "35-55",
+            "skill": "Listening",
+            "resources": [
+              { "type": "youtube", "url": "https://www.youtube.com/watch?v=example", "title": "EnglishClass101 - Numbers" }
+            ],
+            "task": "Nghe và lặp lại số đếm"
+          },
+          {
+            "id": "d2-s4",
+            "time": "55-75",
+            "skill": "Speaking",
+            "task": "Mô tả 5 đồ vật xung quanh bằng màu sắc"
+          },
+          {
+            "id": "d2-s5",
+            "time": "75-90",
+            "skill": "Reading + Writing",
+            "task": "Viết đoạn ngắn về màu sắc yêu thích"
+          }
+        ],
+        "immersion": [
+          "Đặt tên đồ vật trong nhà bằng tiếng Anh",
+          "Nghe podcast 6 Minute English"
+        ],
+        "dailyVocabCount": 15
+      },
+      {
+        "day": 3,
+        "phase": 1,
+        "title": "Ngày 3: Gia đình & Bạn bè",
+        "focus": "Family Members",
+        "sessions": [ /* Tương tự cấu trúc trên, bạn có thể mở rộng */ ],
+        "immersion": ["..."],
+        "dailyVocabCount": 14
+      },
+      {
+        "day": 4,
+        "phase": 1,
+        "title": "Ngày 4: Thức ăn & Đồ uống",
+        "focus": "Food & Drink",
+        "sessions": [],
+        "immersion": [],
+        "dailyVocabCount": 16
+      },
+      {
+        "day": 5,
+        "phase": 1,
+        "title": "Ngày 5: Thời gian & Lịch trình",
+        "focus": "Time & Daily Routine",
+        "sessions": [],
+        "immersion": [],
+        "dailyVocabCount": 15
+      },
+      {
+        "day": 6,
+        "phase": 1,
+        "title": "Ngày 6: Sở thích & Hoạt động",
+        "focus": "Hobbies",
+        "sessions": [],
+        "immersion": [],
+        "dailyVocabCount": 14
+      },
+      {
+        "day": 7,
+        "phase": 1,
+        "title": "Ngày 7: Review Tuần 1 & Giới thiệu bản thân",
+        "focus": "Review & Speaking",
+        "sessions": [
+          {
+            "id": "d7-s1",
+            "time": "0-20",
+            "skill": "Review",
+            "title": "Review Pronunciation & Vocabulary",
+            "task": "Ôn tất cả từ vựng tuần 1 bằng Anki"
+          },
+          {
+            "id": "d7-s2",
+            "time": "20-50",
+            "skill": "Speaking",
+            "title": "Self-introduction",
+            "task": "Ghi âm giới thiệu bản thân đầy đủ (1 phút)"
+          },
+          {
+            "id": "d7-s3",
+            "time": "50-70",
+            "skill": "Listening",
+            "title": "Review Listening",
+            "task": "Nghe lại các audio tuần trước"
+          },
+          {
+            "id": "d7-s4",
+            "time": "70-90",
+            "skill": "Writing",
+            "title": "Weekly Reflection",
+            "task": "Viết đoạn văn 8-10 câu về những gì đã học"
+          }
+        ],
+        "immersion": [
+          "Nói một mình bằng tiếng Anh cả ngày (micro immersion)",
+          "Tìm language partner trên HelloTalk"
+        ],
+        "dailyVocabCount": 0
+      }
+    ]
+  };

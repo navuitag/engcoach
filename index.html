@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="English 60 Days Coach - Kế hoạch học tiếng Anh 60 ngày cho người mới bắt đầu">
+  <meta name="theme-color" content="#1e1b4b">
+  <title>EngCoach - Học Tiếng Anh 60 Ngày</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Điều hướng chính">
+      <div class="sidebar-brand">
+        <div class="brand-logo" aria-hidden="true">EC</div>
+        <div class="brand-text">
+          <span class="brand-name">EngCoach</span>
+          <span class="brand-tagline">60 Days English</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item nav-active" data-nav="dashboard" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+          <span>Trang chủ</span>
+        </button>
+        <button class="nav-item" data-nav="today" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <span>Hôm nay</span>
+        </button>
+        <button class="nav-item" data-nav="library" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          <span>Thư viện</span>
+        </button>
+        <button class="nav-item" data-nav="progress" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-8"/></svg>
+          <span>Tiến độ</span>
+        </button>
+        <button class="nav-item" data-nav="immersion" type="button">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          <span>Immersion</span>
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="sidebar-footer-label">PWA · Offline</span>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header id="app-header" class="app-header">
+        <div class="header-inner">
+          <div class="header-text">
+            <h1>EngCoach</h1>
+            <p>Học tiếng Anh 60 ngày</p>
+          </div>
+        </div>
+      </header>
+
+      <main id="main-content" class="main-content" role="main" aria-live="polite">
+        <div class="page-loading">
+          <div class="loader" aria-hidden="true"></div>
+          <p>Đang tải...</p>
+        </div>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" aria-label="Điều hướng di động">
+      <button class="nav-item nav-active" data-nav="dashboard" type="button" aria-label="Trang chủ">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" data-nav="today" type="button" aria-label="Hôm nay">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg>
+        <span>Today</span>
+      </button>
+      <button class="nav-item" data-nav="library" type="button" aria-label="Thư viện">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        <span>Library</span>
+      </button>
+      <button class="nav-item" data-nav="progress" type="button" aria-label="Tiến độ">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-8"/></svg>
+        <span>Stats</span>
+      </button>
+      <button class="nav-item" data-nav="immersion" type="button" aria-label="Immersion">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+        <span>Immerse</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="data/topics.js"></script>
+  <script src="data/day-content.js"></script>
+  <script src="data/lessons.js"></script>
+  <script src="data/vocabulary.js"></script>
+  <script src="data/resources.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/flashcard.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
