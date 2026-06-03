@@ -1,15 +1,17 @@
-const CACHE_NAME = "engcoach-v1";
+const CACHE_NAME = "engcoach-v2";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./css/style.css",
+  "./css/mindmap.css",
   "./js/utils.js",
   "./js/storage.js",
   "./js/progress.js",
   "./js/flashcard.js",
   "./js/audio.js",
   "./js/router.js",
+  "./js/mindmap.js",
   "./js/app.js",
   "./data/topics.js",
   "./data/day-content.js",

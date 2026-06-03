@@ -25,6 +25,7 @@ const App = {
     Router.register("speaking", () => this.renderSpeaking());
     Router.register("writing", () => this.renderWriting());
     Router.register("review", () => this.renderReview());
+    Router.register("mindmap", () => this.renderMindmap());
 
     document.querySelectorAll("[data-nav]").forEach((el) => {
       el.addEventListener("click", (e) => {
@@ -51,6 +52,12 @@ const App = {
 
   page(html) {
     return `<div class="page">${html}</div>`;
+  },
+
+  renderMindmap() {
+    this.setHeader("Sơ đồ tư duy", "Tổng hợp lộ trình 60 ngày");
+    this.render(MindmapPage.render());
+    MindmapPage.bind(this);
   },
 
   render(html) {
