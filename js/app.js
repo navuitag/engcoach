@@ -56,6 +56,7 @@ const App = {
       slot.innerHTML = EdtechHub.renderButton();
     }
     EdtechHub.bind();
+    Feedback.bind();
   },
 
   refreshLearnerSwitcher() {
@@ -100,6 +101,7 @@ const App = {
   render(html) {
     this.mainEl.innerHTML = this.page(html);
     this.bindEvents();
+    Feedback.bind();
   },
 
   bindEvents() {
@@ -438,11 +440,13 @@ const App = {
         ${LearnerUI.renderAddLearnerForm()}
       </div>
       ${Author.renderAuthorCard()}
+      ${Feedback.renderFeedbackCard()}
     `);
     this.bindProfilePage();
   },
 
   bindProfilePage() {
+    Feedback.bind();
     this.mainEl.querySelectorAll("[data-switch-profile]").forEach((button) => {
       button.addEventListener("click", () => {
         ProfileStore.switchProfile(button.dataset.switchProfile);
