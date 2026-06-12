@@ -279,8 +279,6 @@ const App = {
         <div class="stat-box"><div class="value">${study.totalLabel}</div><div class="label">Tổng giờ học</div></div>
       </div>
 
-      ${EdtechHub.renderGrid()}
-
       <div class="card">
         <div class="card-title">Nhiệm vụ · ${Utils.escapeHTML(lessonTitle)}</div>
         <ul class="task-list">${tasksHtml || "<li><span>Không có nhiệm vụ</span></li>"}</ul>
@@ -297,6 +295,8 @@ const App = {
           <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" onclick="Router.go('review')">Ôn tập</button></div>
         </div>
       </div>
+
+      ${EdtechHub.renderGrid()}
 
       <div class="card">
         <div class="card-title">Theo giai đoạn</div>
