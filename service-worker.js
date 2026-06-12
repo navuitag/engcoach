@@ -1,4 +1,4 @@
-const CACHE_NAME = "engcoach-v6";
+const CACHE_NAME = "engcoach-v7";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,6 +8,9 @@ const ASSETS = [
   "./css/learner.css",
   "./js/utils.js",
   "./js/profileStore.js",
+  "./js/edtechApps.js",
+  "./js/edtechHub.js",
+  "./css/edtech-hub.css",
   "./js/studyTime.js",
   "./js/learnerSwitcher.js",
   "./js/storage.js",

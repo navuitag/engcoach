@@ -11,6 +11,7 @@ const App = {
     this.headerEl = document.getElementById("app-header");
     ProfileStore.ensureReady();
     StudyTime.bind();
+    document.getElementById("edtechHubSidebar").innerHTML = EdtechHub.renderSidebar();
     Storage.initDB();
     FlashcardManager.initCards();
 
@@ -43,7 +44,17 @@ const App = {
 
     Router.init();
     this.refreshLearnerSwitcher();
+    this.refreshEdtechHub();
     this.registerServiceWorker();
+  },
+
+  refreshEdtechHub() {
+    const slot = document.getElementById("edtechHubHeader");
+    if (!slot) return;
+    if (!document.getElementById("edtechHubBtn")) {
+      slot.innerHTML = EdtechHub.renderButton();
+    }
+    EdtechHub.bind();
   },
 
   refreshLearnerSwitcher() {
@@ -64,6 +75,7 @@ const App = {
     const handler = Router.routes[path] || Router.routes.dashboard;
     if (handler) handler(params);
     this.refreshLearnerSwitcher();
+    this.refreshEdtechHub();
   },
 
   setHeader(title, subtitle) {
@@ -265,6 +277,8 @@ const App = {
         <div class="stat-box"><div class="value">${stats.completedDays}</div><div class="label">Ngày xong</div></div>
         <div class="stat-box"><div class="value">${study.totalLabel}</div><div class="label">Tổng giờ học</div></div>
       </div>
+
+      ${EdtechHub.renderGrid()}
 
       <div class="card">
         <div class="card-title">Nhiệm vụ · ${Utils.escapeHTML(lessonTitle)}</div>
