@@ -62,3 +62,11 @@ engcoach/
 - `data/resources.js` — Link YouTube/website curated
 
 Tiến độ lưu tự động trong trình duyệt (localStorage + IndexedDB).
+
+---
+
+## Tác giả
+
+- **Nguyễn Anh Vũ**
+- Email: [navuitag@gmail.com](mailto:navuitag@gmail.com)
+- Điện thoại: [0986201079](tel:+84986201079)

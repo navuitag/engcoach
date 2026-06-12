@@ -12,6 +12,7 @@ const App = {
     ProfileStore.ensureReady();
     StudyTime.bind();
     document.getElementById("edtechHubSidebar").innerHTML = EdtechHub.renderSidebar();
+    document.getElementById("authorSidebar").innerHTML = Author.renderSidebar();
     Storage.initDB();
     FlashcardManager.initCards();
 
@@ -87,7 +88,7 @@ const App = {
   },
 
   page(html) {
-    return `<div class="page">${html}</div>`;
+    return `<div class="page">${html}</div>${Author.renderAppFooter()}`;
   },
 
   renderMindmap(params = []) {
@@ -436,6 +437,7 @@ const App = {
         <div class="learner-list">${LearnerUI.renderLearnerList(profiles)}</div>
         ${LearnerUI.renderAddLearnerForm()}
       </div>
+      ${Author.renderAuthorCard()}
     `);
     this.bindProfilePage();
   },
