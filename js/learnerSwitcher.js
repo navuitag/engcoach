@@ -19,7 +19,7 @@ const LearnerUI = {
           <span class="learner-avatar" style="background:${Utils.escapeHTML(profile.avatarColor)}">${Utils.escapeHTML(this.initials(profile.name))}</span>
           <span class="learner-menu-meta">
             <strong>${Utils.escapeHTML(profile.name)}</strong>
-            <small>Ngày ${profile.summary.currentDay} · ${profile.summary.completedDays} hoàn thành</small>
+            <small>${profile.summary.studyTodayLabel || "0 phút"} hôm nay · ${profile.summary.studyTotalLabel || "0 phút"} tổng</small>
           </span>
         </button>`;
     }).join("");
@@ -98,7 +98,7 @@ const LearnerUI = {
             <span class="learner-avatar learner-avatar-lg" style="background:${Utils.escapeHTML(profile.avatarColor)}">${Utils.escapeHTML(this.initials(profile.name))}</span>
             <div>
               <h3>${Utils.escapeHTML(profile.name)}${isActive ? ' <span class="tag">Đang học</span>' : ""}</h3>
-              <p>Ngày ${profile.summary.currentDay}/60 · ${profile.summary.completedDays} ngày xong · Streak ${profile.summary.streak}</p>
+              <p>Ngày ${profile.summary.currentDay}/60 · ${profile.summary.studyTotalLabel || "0 phút"} tổng · Streak ${profile.summary.streak}</p>
             </div>
           </div>
           <div class="learner-card-actions">

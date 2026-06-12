@@ -10,6 +10,7 @@ const App = {
     this.mainEl = document.getElementById("main-content");
     this.headerEl = document.getElementById("app-header");
     ProfileStore.ensureReady();
+    StudyTime.bind();
     Storage.initDB();
     FlashcardManager.initCards();
 
@@ -214,6 +215,7 @@ const App = {
 
   renderDashboard() {
     const stats = ProgressManager.getStatsSummary();
+    const study = StudyTime.getSummary(Storage.getProgress());
     const userName = ProfileStore.getState().userName;
     const lesson = ProgressManager.getLesson(stats.currentDay);
     const dayProgress = ProgressManager.getDayProgress(stats.currentDay);
@@ -258,10 +260,10 @@ const App = {
       </div>
 
       <div class="stat-grid">
-        <div class="stat-box stat-accent"><div class="value">${stats.streak}</div><div class="label">Streak</div></div>
+        <div class="stat-box stat-accent"><div class="value">${study.todayLabel}</div><div class="label">Học hôm nay</div></div>
+        <div class="stat-box"><div class="value">${stats.streak}</div><div class="label">Streak</div></div>
         <div class="stat-box"><div class="value">${stats.completedDays}</div><div class="label">Ngày xong</div></div>
-        <div class="stat-box"><div class="value">${stats.wordsLearned}</div><div class="label">Từ vựng</div></div>
-        <div class="stat-box"><div class="value">${dayProgress}%</div><div class="label">Hôm nay</div></div>
+        <div class="stat-box"><div class="value">${study.totalLabel}</div><div class="label">Tổng giờ học</div></div>
       </div>
 
       <div class="card">
@@ -475,6 +477,7 @@ const App = {
 
   renderProgress() {
     const stats = ProgressManager.getStatsSummary();
+    const study = StudyTime.getSummary(Storage.getProgress());
     const notes = Storage.getNotes().slice(0, 10);
     const chartData = ProgressManager.getChartData();
 
@@ -494,8 +497,9 @@ const App = {
     this.setHeader("Theo dõi tiến độ", "Thống kê và nhật ký học tập");
     this.render(`
       <div class="stat-grid">
+        <div class="stat-box"><div class="value">${study.todayLabel}</div><div class="label">Học hôm nay</div></div>
         <div class="stat-box"><div class="value">${stats.percent}%</div><div class="label">Hoàn thành</div></div>
-        <div class="stat-box"><div class="value">${Math.round((Storage.getProgress().totalStudyMinutes || 0) / 60)}h</div><div class="label">Tổng giờ học</div></div>
+        <div class="stat-box"><div class="value">${study.totalLabel}</div><div class="label">Tổng giờ học</div></div>
         <div class="stat-box"><div class="value">${stats.shadowingCount}</div><div class="label">Shadowing</div></div>
         <div class="stat-box"><div class="value">${stats.writingCount}</div><div class="label">Bài viết</div></div>
       </div>

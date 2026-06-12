@@ -21,6 +21,10 @@ const ProfileStore = {
       streak: 0,
       lastStudyDate: null,
       totalStudyMinutes: 0,
+      studyMinutesToday: 0,
+      studyMinutesTotal: 0,
+      studyLastDate: null,
+      studyDailyLog: [],
       listeningHours: 0,
       wordsLearned: 0,
       shadowingCount: 0,
@@ -169,11 +173,14 @@ const ProfileStore = {
   summarize(profileId) {
     const bundle = this.getBundle(profileId);
     const p = bundle.progress || {};
+    const study = typeof StudyTime !== "undefined" ? StudyTime.getSummary(p) : { todayLabel: "0 phút", totalLabel: "0 phút" };
     return {
       currentDay: p.currentDay || 1,
       completedDays: (p.completedDays || []).length,
       streak: p.streak || 0,
-      wordsLearned: p.wordsLearned || 0
+      wordsLearned: p.wordsLearned || 0,
+      studyTodayLabel: study.todayLabel,
+      studyTotalLabel: study.totalLabel
     };
   },
 
