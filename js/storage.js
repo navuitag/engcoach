@@ -43,96 +43,99 @@ const Storage = {
     });
   },
 
-  get(key, defaultValue = null) {
-    try {
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : defaultValue;
-    } catch {
-      return defaultValue;
-    }
-  },
-
-  set(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+  getActiveProfileId() {
+    return ProfileStore.getState().profileId;
   },
 
   getProgress() {
-    return this.get(this.KEYS.PROGRESS, {
-      currentDay: 1,
-      completedDays: [],
-      sessionChecks: {},
-      streak: 0,
-      lastStudyDate: null,
-      totalStudyMinutes: 0,
-      listeningHours: 0,
-      wordsLearned: 0,
-      shadowingCount: 0,
-      quizScores: []
-    });
+    return { ...ProfileStore.defaultProgress(), ...ProfileStore.getBundle().progress };
   },
 
   saveProgress(progress) {
-    this.set(this.KEYS.PROGRESS, progress);
+    ProfileStore.updateBundle((bundle) => {
+      bundle.progress = progress;
+    });
   },
 
   getSettings() {
-    return this.get(this.KEYS.SETTINGS, {
-      userName: "Learner",
-      startDate: Utils.formatDate(),
-      reminderEnabled: false
-    });
+    const bundle = ProfileStore.getBundle();
+    const profile = ProfileStore.getActiveProfile();
+    return {
+      ...ProfileStore.defaultSettings(),
+      ...bundle.settings,
+      userName: profile?.name || bundle.settings?.userName || "Học viên"
+    };
   },
 
   saveSettings(settings) {
-    this.set(this.KEYS.SETTINGS, settings);
+    ProfileStore.updateBundle((bundle) => {
+      bundle.settings = settings;
+    });
+    const profile = ProfileStore.getActiveProfile();
+    if (profile && settings.userName) {
+      profile.name = settings.userName;
+      ProfileStore.saveAccounts(ProfileStore.accounts);
+    }
   },
 
   getFlashcardState() {
-    return this.get(this.KEYS.FLASHCARDS, {});
+    return ProfileStore.getBundle().flashcards || {};
   },
 
   saveFlashcardState(state) {
-    this.set(this.KEYS.FLASHCARDS, state);
+    ProfileStore.updateBundle((bundle) => {
+      bundle.flashcards = state;
+    });
   },
 
   getNotes() {
-    return this.get(this.KEYS.NOTES, []);
+    return ProfileStore.getBundle().notes || [];
   },
 
   saveNotes(notes) {
-    this.set(this.KEYS.NOTES, notes);
+    ProfileStore.updateBundle((bundle) => {
+      bundle.notes = notes;
+    });
   },
 
   getStats() {
-    return this.get(this.KEYS.STATS, {
+    return {
       dailyLogs: [],
       writingEntries: [],
-      speakingRecordings: 0
-    });
+      speakingRecordings: 0,
+      ...ProfileStore.getBundle().stats
+    };
   },
 
   saveStats(stats) {
-    this.set(this.KEYS.STATS, stats);
-  },
-
-  getImmersionState() {
-    return this.get(this.KEYS.IMMERSION, {
-      checklist: {},
-      lastPrompt: null
+    ProfileStore.updateBundle((bundle) => {
+      bundle.stats = stats;
     });
   },
 
+  getImmersionState() {
+    return {
+      checklist: {},
+      lastPrompt: null,
+      ...ProfileStore.getBundle().immersion
+    };
+  },
+
   saveImmersionState(state) {
-    this.set(this.KEYS.IMMERSION, state);
+    ProfileStore.updateBundle((bundle) => {
+      bundle.immersion = state;
+    });
   },
 
   async saveRecording(blob, metadata) {
     await this.initDB();
+    const profileId = this.getActiveProfileId();
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction("recordings", "readwrite");
       const store = tx.objectStore("recordings");
       const record = {
         ...metadata,
+        profileId,
         blob,
         createdAt: new Date().toISOString()
       };
@@ -144,10 +147,14 @@ const Storage = {
 
   async getRecordings() {
     await this.initDB();
+    const profileId = this.getActiveProfileId();
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction("recordings", "readonly");
       const req = tx.objectStore("recordings").getAll();
-      req.onsuccess = () => resolve(req.result || []);
+      req.onsuccess = () => {
+        const all = req.result || [];
+        resolve(all.filter((r) => !r.profileId || r.profileId === profileId));
+      };
       req.onerror = () => reject(req.error);
     });
   },

@@ -1,11 +1,14 @@
-const CACHE_NAME = "engcoach-v4";
+const CACHE_NAME = "engcoach-v5";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./css/style.css",
   "./css/mindmap.css",
+  "./css/learner.css",
   "./js/utils.js",
+  "./js/profileStore.js",
+  "./js/learnerSwitcher.js",
   "./js/storage.js",
   "./js/progress.js",
   "./js/flashcard.js",

@@ -9,6 +9,7 @@ const App = {
   init() {
     this.mainEl = document.getElementById("main-content");
     this.headerEl = document.getElementById("app-header");
+    ProfileStore.ensureReady();
     Storage.initDB();
     FlashcardManager.initCards();
 
@@ -26,6 +27,7 @@ const App = {
     Router.register("writing", () => this.renderWriting());
     Router.register("review", () => this.renderReview());
     Router.register("mindmap", (p) => this.renderMindmap(p));
+    Router.register("profile", () => this.renderProfile());
 
     document.querySelectorAll("[data-nav]").forEach((el) => {
       el.addEventListener("click", (e) => {
@@ -39,7 +41,28 @@ const App = {
     }, { passive: true });
 
     Router.init();
+    this.refreshLearnerSwitcher();
     this.registerServiceWorker();
+  },
+
+  refreshLearnerSwitcher() {
+    const el = document.getElementById("header-switcher");
+    if (!el) return;
+    el.innerHTML = LearnerUI.renderSwitcher();
+    LearnerUI.bindSwitcher({
+      onSwitch: (profileId) => {
+        ProfileStore.switchProfile(profileId);
+        this.refreshCurrentRoute();
+      },
+      onAdd: () => Router.go("profile")
+    });
+  },
+
+  refreshCurrentRoute() {
+    const { path, params } = Router.getRoute();
+    const handler = Router.routes[path] || Router.routes.dashboard;
+    if (handler) handler(params);
+    this.refreshLearnerSwitcher();
   },
 
   setHeader(title, subtitle) {
@@ -191,7 +214,7 @@ const App = {
 
   renderDashboard() {
     const stats = ProgressManager.getStatsSummary();
-    const settings = Storage.getSettings();
+    const userName = ProfileStore.getState().userName;
     const lesson = ProgressManager.getLesson(stats.currentDay);
     const dayProgress = ProgressManager.getDayProgress(stats.currentDay);
     const tasks = ProgressManager.getTodayTasks();
@@ -220,7 +243,7 @@ const App = {
 
     const lessonTitle = lesson ? lesson.title.replace(/^Ngày \d+: /, "") : "";
 
-    this.setHeader(`Xin chào, ${settings.userName}!`, "English 60 Days Coach · 60 ngày");
+    this.setHeader(`Xin chào, ${userName}!`, "English 60 Days Coach · 60 ngày");
     this.render(`
       <div class="card card-hero">
         <div class="card-title">Tiến độ chương trình</div>
@@ -385,6 +408,69 @@ const App = {
         }, 250)
       );
     }
+  },
+
+  renderProfile() {
+    const profiles = ProfileStore.getProfiles();
+    this.setHeader("Người học", "Quản lý hồ sơ trên thiết bị này");
+    this.render(`
+      <div class="card">
+        <div class="card-title">Nhiều người học</div>
+        <p class="profile-page-intro">Mỗi người có tiến độ, flashcard và ghi chú riêng. Chuyển hồ sơ ở góc trên hoặc bên dưới.</p>
+        <div class="learner-list">${LearnerUI.renderLearnerList(profiles)}</div>
+        ${LearnerUI.renderAddLearnerForm()}
+      </div>
+    `);
+    this.bindProfilePage();
+  },
+
+  bindProfilePage() {
+    this.mainEl.querySelectorAll("[data-switch-profile]").forEach((button) => {
+      button.addEventListener("click", () => {
+        ProfileStore.switchProfile(button.dataset.switchProfile);
+        this.refreshCurrentRoute();
+      });
+    });
+
+    this.mainEl.querySelectorAll("[data-rename-profile]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const profile = ProfileStore.getProfiles().find((item) => item.id === button.dataset.renameProfile);
+        if (!profile) return;
+        const nextName = window.prompt("Tên mới:", profile.name);
+        if (!nextName?.trim()) return;
+        ProfileStore.renameProfile(profile.id, nextName.trim());
+        this.refreshCurrentRoute();
+      });
+    });
+
+    this.mainEl.querySelectorAll("[data-reset-profile]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const profile = ProfileStore.getProfiles().find((item) => item.id === button.dataset.resetProfile);
+        if (!profile) return;
+        if (!window.confirm(`Xóa toàn bộ tiến độ của "${profile.name}"?`)) return;
+        ProfileStore.resetProfileData(profile.id);
+        this.refreshCurrentRoute();
+      });
+    });
+
+    this.mainEl.querySelectorAll("[data-delete-profile]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const profile = ProfileStore.getProfiles().find((item) => item.id === button.dataset.deleteProfile);
+        if (!profile) return;
+        if (!window.confirm(`Xóa hồ sơ "${profile.name}" và toàn bộ tiến độ?`)) return;
+        ProfileStore.deleteProfile(profile.id);
+        this.refreshCurrentRoute();
+      });
+    });
+
+    const form = document.getElementById("addLearnerForm");
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = new FormData(form).get("name");
+      if (!name || !String(name).trim()) return;
+      ProfileStore.createProfile(String(name).trim());
+      this.refreshCurrentRoute();
+    });
   },
 
   renderProgress() {
