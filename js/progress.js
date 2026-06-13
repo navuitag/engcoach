@@ -33,6 +33,10 @@ const ProgressManager = {
     return Storage.getProgress().completedDays.includes(day);
   },
 
+  markDayComplete(day) {
+    return Storage.markDayComplete(day);
+  },
+
   getPhaseProgress(phaseId) {
     const phaseDays = english60Data.lessons.filter((l) => l.phase === phaseId);
     const progress = Storage.getProgress();
