@@ -121,6 +121,13 @@ const App = {
       });
     });
 
+    this.mainEl.querySelectorAll("[data-route]").forEach((el) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        Router.go(el.getAttribute("data-route"));
+      });
+    });
+
     this.mainEl.querySelectorAll(".day-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const day = Number(btn.dataset.day);
@@ -289,12 +296,12 @@ const App = {
       <div class="card">
         <div class="card-title">Kỹ năng</div>
         <div class="skill-pills">
-          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" onclick="Router.go('vocabulary')">Từ vựng</button></div>
-          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" onclick="Router.go('grammar')">Ngữ pháp</button></div>
-          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" onclick="Router.go('listening')">Nghe</button></div>
-          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" onclick="Router.go('speaking')">Nói</button></div>
-          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" onclick="Router.go('writing')">Viết</button></div>
-          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" onclick="Router.go('review')">Ôn tập</button></div>
+          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" data-route="vocabulary">Từ vựng</button></div>
+          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" data-route="grammar">Ngữ pháp</button></div>
+          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" data-route="listening">Nghe</button></div>
+          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" data-route="speaking">Nói</button></div>
+          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" data-route="writing">Viết</button></div>
+          <div class="skill-pill"><button type="button" class="btn btn-secondary btn-sm" data-route="review">Ôn tập</button></div>
         </div>
       </div>
 
@@ -761,7 +768,7 @@ const App = {
         <a class="resource-link" href="https://learnenglish.britishcouncil.org/grammar" target="_blank">British Council Grammar</a>
         <a class="resource-link" href="https://dictionary.cambridge.org/grammar/" target="_blank">Cambridge Grammar</a>
       </div>
-      <button class="btn btn-secondary btn-block" onclick="Router.go('today')">← Về bài học hôm nay</button>
+      <button class="btn btn-secondary btn-block" data-route="today">← Về bài học hôm nay</button>
     `);
   },
 
@@ -789,7 +796,7 @@ const App = {
         <div class="card-title">🔗 Tài liệu bổ sung</div>
         ${extraResources}
       </div>
-      <button class="btn btn-secondary btn-block" onclick="Router.go('today')">← Về bài học hôm nay</button>
+      <button class="btn btn-secondary btn-block" data-route="today">← Về bài học hôm nay</button>
     `);
   },
 
@@ -814,7 +821,7 @@ const App = {
         <div class="timer-display" id="speak-timer">3:00</div>
         <button class="btn btn-primary btn-block" data-action="start-shadowing">Bắt đầu shadowing 3 phút</button>
       </div>
-      <button class="btn btn-secondary btn-block" onclick="Router.go('immersion')">💬 Self-talk prompts</button>
+      <button class="btn btn-secondary btn-block" data-route="immersion">💬 Self-talk prompts</button>
     `);
   },
 
@@ -875,8 +882,8 @@ const App = {
         <div class="stat-box"><div class="value">${recentDays.length}</div><div class="label">Ngày gần đây</div></div>
       </div>
       <div class="card">
-        <button class="btn btn-primary btn-block" onclick="Router.go('vocabulary')">🃏 Ôn Flashcard</button>
-        <button class="btn btn-secondary btn-block" onclick="Router.go('vocabulary')" style="margin-top:0.5rem">🎯 Làm Quiz</button>
+        <button class="btn btn-primary btn-block" data-route="vocabulary">🃏 Ôn Flashcard</button>
+        <button class="btn btn-secondary btn-block" data-route="vocabulary" style="margin-top:0.5rem">🎯 Làm Quiz</button>
       </div>
       <div class="card">
         <div class="card-title">📅 Ngày đã hoàn thành gần đây</div>
