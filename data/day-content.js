@@ -16,7 +16,7 @@ const TOPIC_DETAILS = {
       title: "Greetings & Self-introduction",
       description: "12 cụm chào hỏi thông dụng + động từ to be",
       task: "Viết 8 câu: 3 chào hỏi, 3 giới thiệu, 2 cảm ơn/xin lỗi",
-      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/english-levels/waystage-a1", title: "British Council A1 - Greetings" },
+      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/free-resources/speaking/a1/meeting-new-people", title: "BC A1 - Meeting new people" },
       examples: ["Hello, my name is Linh.", "Nice to meet you!", "Good morning, how are you?"]
     },
     listening: {
@@ -54,7 +54,7 @@ const TOPIC_DETAILS = {
       title: "Numbers 1-20 & Colors",
       description: "Số đếm + 6 màu cơ bản + This is / That is",
       task: "Đếm đồ vật trong phòng: 5 câu There are... / I see...",
-      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/grammar/english-grammar-reference/numbers", title: "BC - Numbers" },
+      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/free-resources/grammar/english-grammar-reference/count-nouns", title: "BC - Numbers" },
       examples: ["I have three books.", "The sky is blue.", "How many apples? — Five."]
     },
     listening: {
@@ -91,7 +91,7 @@ const TOPIC_DETAILS = {
       title: "Family Members & Possessives",
       description: "mother, father, siblings + my/your/his/her",
       task: "Vẽ sơ đồ gia đình, ghi tên tiếng Anh + 1 câu/ người",
-      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/grammar/elementary-to-pre-intermediate/possessives", title: "BC - Possessives" },
+      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/free-resources/grammar/a1-a2/possessive-s", title: "BC - Possessives" },
       examples: ["My mother is kind.", "His sister is a student.", "We have a big family."]
     },
     listening: {
@@ -127,7 +127,7 @@ const TOPIC_DETAILS = {
       title: "Food & Drink + Some/Any",
       description: "Countable/uncountable nouns, some water, an apple",
       task: "Liệt kê bữa sáng hôm nay bằng 6 câu English",
-      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/grammar/elementary-to-pre-intermediate/so-any", title: "BC - Some/Any" },
+      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/free-resources/grammar/a1-a2/nouns-countable-uncountable", title: "BC - Some/Any" },
       examples: ["I'd like some coffee.", "Do you have any bread?", "I eat rice for lunch."]
     },
     listening: {
@@ -163,7 +163,7 @@ const TOPIC_DETAILS = {
       title: "Time & Daily Routine",
       description: "at/in/on + always, usually, sometimes, never",
       task: "Viết daily routine từ 6am-10pm (10 câu)",
-      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/grammar/elementary-to-pre-intermediate/adverbs-of-frequency", title: "BC - Frequency adverbs" },
+      resource: { type: "website", url: "https://learnenglish.britishcouncil.org/free-resources/grammar/english-grammar-reference/how-often", title: "BC - Frequency adverbs" },
       examples: ["I usually wake up at 6.", "She never eats breakfast.", "We study in the evening."]
     },
     listening: {
