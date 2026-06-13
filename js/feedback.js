@@ -55,12 +55,25 @@ const Feedback = (() => {
       </div>`;
   }
 
+  function bindFeedbackModal(backdrop) {
+    if (!backdrop || backdrop.dataset.feedbackBound === "true") return;
+    backdrop.dataset.feedbackBound = "true";
+    backdrop.addEventListener("click", (event) => {
+      if (event.target === backdrop || event.target.closest("[data-feedback-close]")) closeFeedbackModal();
+    });
+    backdrop.querySelector("#feedbackModalForm")?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submitFeedbackForm(event.currentTarget);
+    });
+  }
+
   function ensureFeedbackModal() {
     let backdrop = document.getElementById("feedbackBackdrop");
     if (!backdrop) {
       document.body.insertAdjacentHTML("beforeend", renderFeedbackModal());
       backdrop = document.getElementById("feedbackBackdrop");
     }
+    bindFeedbackModal(backdrop);
     return backdrop;
   }
 
@@ -100,17 +113,7 @@ const Feedback = (() => {
         submitFeedbackForm(profileForm);
       });
     }
-    const backdrop = document.getElementById("feedbackBackdrop");
-    if (backdrop && backdrop.dataset.feedbackBound !== "true") {
-      backdrop.dataset.feedbackBound = "true";
-      backdrop.addEventListener("click", (event) => {
-        if (event.target === backdrop || event.target.closest("[data-feedback-close]")) closeFeedbackModal();
-      });
-      backdrop.querySelector("#feedbackModalForm")?.addEventListener("submit", (event) => {
-        event.preventDefault();
-        submitFeedbackForm(event.currentTarget);
-      });
-    }
+    bindFeedbackModal(document.getElementById("feedbackBackdrop"));
     if (feedbackBound) return;
     feedbackBound = true;
     document.addEventListener("keydown", (event) => {
