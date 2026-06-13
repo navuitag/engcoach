@@ -1397,3 +1397,87 @@ textarea:focus,
     transition-duration: 0.01ms !important;
   }
 }
+
+.speaking-rec-hint {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+}
+
+.rec-status {
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+  text-align: center;
+}
+
+.rec-playback {
+  background: var(--slate-50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+  padding: 0.875rem;
+}
+
+.rec-playback-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.rec-player {
+  display: block;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.speaking-timer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.speaking-timer-actions .btn {
+  flex: 1 1 140px;
+}
+
+.speaking-prompts {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.recording-list {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.recording-item {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.75rem;
+}
+
+.recording-meta {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.recording-meta strong {
+  font-size: 0.925rem;
+}
+
+.recording-meta span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.recording-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

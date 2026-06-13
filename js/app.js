@@ -6,6 +6,9 @@ const App = {
   quizIndex: 0,
   quizScore: 0,
 
+  shadowingAutoRecord: false,
+  _latestPlaybackUrl: null,
+
   init() {
     this.mainEl = document.getElementById("main-content");
     this.headerEl = document.getElementById("app-header");
@@ -128,6 +131,24 @@ const App = {
       });
     });
 
+    this.mainEl.querySelectorAll("[data-play-recording]").forEach((el) => {
+      el.addEventListener("click", async () => {
+        const id = Number(el.getAttribute("data-play-recording"));
+        const recordings = await Storage.getRecordings();
+        const rec = recordings.find((item) => item.id === id);
+        if (rec?.blob) AudioManager.playBlob(rec.blob);
+      });
+    });
+
+    this.mainEl.querySelectorAll("[data-delete-recording]").forEach((el) => {
+      el.addEventListener("click", async () => {
+        const id = Number(el.getAttribute("data-delete-recording"));
+        if (!window.confirm("Xóa bản ghi âm này?")) return;
+        await Storage.deleteRecording(id);
+        await this.refreshSpeakingRecordings();
+      });
+    });
+
     this.mainEl.querySelectorAll(".day-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const day = Number(btn.dataset.day);
@@ -158,7 +179,7 @@ const App = {
       "save-journal": () => this.saveJournal(),
       "start-recording": () => this.toggleRecording(el),
       "start-shadowing": () => this.startShadowingTimer(),
-      "stop-shadowing": () => AudioManager.stopShadowingTimer(),
+      "stop-shadowing": () => this.stopShadowingSession(),
       "random-prompt": () => this.showRandomPrompt(),
       "import-vocab": () => {
         const day = ProgressManager.getCurrentDay();
@@ -804,25 +825,172 @@ const App = {
     const day = ProgressManager.getCurrentDay();
     const lesson = ProgressManager.getLesson(day);
     const speakingSession = (lesson?.sessions || []).find((s) => s.skill?.includes("Speaking"));
+    const promptsHtml = speakingSession?.prompts?.length
+      ? `<ul class="speaking-prompts">${speakingSession.prompts.map((p) => `<li>${Utils.escapeHTML(p)}</li>`).join("")}</ul>`
+      : "";
 
     this.setHeader("Speaking", "Shadowing & Ghi âm");
     this.render(`
       <div class="card">
         <div class="card-title">🗣️ Nhiệm vụ hôm nay</div>
         <p>${speakingSession ? Utils.escapeHTML(speakingSession.task || speakingSession.title) : "Ghi âm giới thiệu bản thân 30 giây"}</p>
+        ${promptsHtml}
       </div>
       <div class="card">
-        <div class="card-title">🎙️ Ghi âm</div>
-        <p id="rec-status" style="text-align:center;color:var(--text-muted)">Sẵn sàng ghi âm</p>
+        <div class="card-title">🎙️ Ghi âm giọng nói</div>
+        <p class="speaking-rec-hint">Ứng dụng sẽ xin quyền microphone. Ghi âm tự động khi bạn bắt đầu shadowing, hoặc bấm nút bên dưới.</p>
+        <p id="rec-status" class="rec-status">Sẵn sàng ghi âm</p>
+        <div id="rec-playback" class="rec-playback" hidden></div>
         <button class="btn btn-primary btn-block" id="rec-btn" data-action="start-recording">● Bắt đầu ghi âm</button>
       </div>
       <div class="card">
         <div class="card-title">⏱️ Shadowing Timer</div>
+        <p class="speaking-rec-hint">Bắt đầu timer sẽ tự động ghi âm để bạn nghe lại sau khi luyện.</p>
         <div class="timer-display" id="speak-timer">3:00</div>
-        <button class="btn btn-primary btn-block" data-action="start-shadowing">Bắt đầu shadowing 3 phút</button>
+        <div class="speaking-timer-actions">
+          <button class="btn btn-primary" data-action="start-shadowing">Bắt đầu shadowing 3 phút</button>
+          <button class="btn btn-outline" data-action="stop-shadowing">Dừng</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔊 Nghe lại bản ghi</div>
+        <div id="speaking-recordings" class="recording-list">
+          <p class="empty-state">Đang tải bản ghi...</p>
+        </div>
       </div>
       <button class="btn btn-secondary btn-block" data-route="immersion">💬 Self-talk prompts</button>
     `);
+    this.refreshSpeakingRecordings();
+  },
+
+  renderRecordingsList(recordings) {
+    if (!recordings.length) {
+      return '<p class="empty-state">Chưa có bản ghi. Hãy ghi âm hoặc bắt đầu shadowing.</p>';
+    }
+    return recordings
+      .map((rec) => {
+        const when = rec.createdAt ? new Date(rec.createdAt).toLocaleString("vi-VN") : "";
+        return `
+          <article class="recording-item">
+            <div class="recording-meta">
+              <strong>${Utils.escapeHTML(rec.label || "Bản ghi speaking")}</strong>
+              <span>${Utils.escapeHTML(when)}</span>
+            </div>
+            <div class="recording-actions">
+              <button type="button" class="btn btn-secondary btn-sm" data-play-recording="${rec.id}">▶ Nghe lại</button>
+              <button type="button" class="btn btn-outline btn-sm" data-delete-recording="${rec.id}">Xóa</button>
+            </div>
+          </article>`;
+      })
+      .join("");
+  },
+
+  async refreshSpeakingRecordings() {
+    const listEl = document.getElementById("speaking-recordings");
+    if (!listEl) return;
+    const recordings = await Storage.getRecordings();
+    recordings.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    listEl.innerHTML = this.renderRecordingsList(recordings.slice(0, 12));
+    this.bindEvents();
+  },
+
+  showRecordingPlayback(blob, label) {
+    const el = document.getElementById("rec-playback");
+    if (!el || !blob) return;
+    if (this._latestPlaybackUrl) {
+      AudioManager.revokePlaybackUrl(this._latestPlaybackUrl);
+    }
+    this._latestPlaybackUrl = AudioManager.createPlaybackUrl(blob);
+    el.hidden = false;
+    el.innerHTML = `
+      <p class="rec-playback-label">${Utils.escapeHTML(label || "Bản ghi vừa xong")}</p>
+      <audio controls class="rec-player" src="${this._latestPlaybackUrl}"></audio>
+      <button type="button" class="btn btn-secondary btn-sm" data-action="replay-latest-recording">▶ Nghe lại</button>
+    `;
+    el.querySelector("[data-action='replay-latest-recording']")?.addEventListener("click", () => {
+      AudioManager.playBlob(blob);
+    });
+    el.querySelector("audio")?.play().catch(() => {});
+  },
+
+  async finishSpeakingRecording(label) {
+    const blob = await AudioManager.stopRecording();
+    const status = document.getElementById("rec-status");
+    const btn = document.getElementById("rec-btn");
+    if (!blob) {
+      if (status) status.textContent = "Không có dữ liệu ghi âm";
+      if (btn) btn.textContent = "● Bắt đầu ghi âm";
+      return null;
+    }
+    const saveLabel = label || `Speaking Day ${ProgressManager.getCurrentDay()}`;
+    await AudioManager.saveRecording(blob, saveLabel);
+    if (status) status.textContent = "✅ Đã lưu — nghe lại bên dưới";
+    if (btn) btn.textContent = "● Ghi âm lại";
+    this.showRecordingPlayback(blob, saveLabel);
+    await this.refreshSpeakingRecordings();
+    return blob;
+  },
+
+  async toggleRecording(btn) {
+    const status = document.getElementById("rec-status");
+    if (AudioManager.mediaRecorder?.state === "recording") {
+      await this.finishSpeakingRecording(`Speaking Day ${ProgressManager.getCurrentDay()}`);
+      this.shadowingAutoRecord = false;
+    } else {
+      const ok = await AudioManager.startRecording();
+      if (ok) {
+        if (status) status.textContent = "🔴 Đang ghi âm...";
+        btn.textContent = "■ Dừng ghi âm";
+      } else if (status) {
+        status.textContent = "❌ Không thể truy cập microphone — hãy cho phép trong trình duyệt";
+      }
+    }
+  },
+
+  async startShadowingRecording() {
+    if (AudioManager.mediaRecorder?.state === "recording") return true;
+    const ok = await AudioManager.startRecording();
+    if (!ok) return false;
+    this.shadowingAutoRecord = true;
+    const status = document.getElementById("rec-status");
+    const btn = document.getElementById("rec-btn");
+    if (status) status.textContent = "🔴 Đang ghi âm shadowing...";
+    if (btn) btn.textContent = "■ Dừng ghi âm";
+    return true;
+  },
+
+  async stopShadowingSession() {
+    AudioManager.stopShadowingTimer();
+    const display = document.getElementById("timer-display") || document.getElementById("speak-timer");
+    if (display && display.textContent.includes(":")) {
+      display.textContent = "Đã dừng";
+    }
+    if (this.shadowingAutoRecord && AudioManager.mediaRecorder?.state === "recording") {
+      await this.finishSpeakingRecording(`Shadowing Day ${ProgressManager.getCurrentDay()}`);
+      this.shadowingAutoRecord = false;
+    }
+  },
+
+  startShadowingTimer() {
+    const display = document.getElementById("timer-display") || document.getElementById("speak-timer");
+    const duration = display?.id === "speak-timer" ? 180 : 300;
+    if (display?.id === "speak-timer") {
+      this.startShadowingRecording();
+    }
+    AudioManager.startShadowingTimer(
+      duration,
+      (sec) => {
+        if (display) display.textContent = AudioManager.formatTime(sec);
+      },
+      async () => {
+        ProgressManager.incrementStat("shadowingCount");
+        if (display) display.textContent = "Hoàn thành! 🎉";
+        if (this.shadowingAutoRecord && AudioManager.mediaRecorder?.state === "recording") {
+          await this.finishSpeakingRecording(`Shadowing Day ${ProgressManager.getCurrentDay()}`);
+          this.shadowingAutoRecord = false;
+        }
+      }
+    );
   },
 
   renderWriting() {
@@ -907,41 +1075,6 @@ const App = {
     alert(`Đã lưu! ${result.words} từ, ${result.sentences} câu`);
     el.value = "";
     this.renderWriting();
-  },
-
-  async toggleRecording(btn) {
-    const status = document.getElementById("rec-status");
-    if (AudioManager.mediaRecorder?.state === "recording") {
-      const blob = await AudioManager.stopRecording();
-      if (blob) {
-        await AudioManager.saveRecording(blob, `Speaking Day ${ProgressManager.getCurrentDay()}`);
-        status.textContent = "✅ Đã lưu bản ghi âm!";
-        btn.textContent = "● Ghi âm lại";
-      }
-    } else {
-      const ok = await AudioManager.startRecording();
-      if (ok) {
-        status.textContent = "🔴 Đang ghi âm...";
-        btn.textContent = "■ Dừng ghi âm";
-      } else {
-        status.textContent = "❌ Không thể truy cập microphone";
-      }
-    }
-  },
-
-  startShadowingTimer() {
-    const display = document.getElementById("timer-display") || document.getElementById("speak-timer");
-    const duration = display?.id === "speak-timer" ? 180 : 300;
-    AudioManager.startShadowingTimer(
-      duration,
-      (sec) => {
-        if (display) display.textContent = AudioManager.formatTime(sec);
-      },
-      () => {
-        ProgressManager.incrementStat("shadowingCount");
-        if (display) display.textContent = "Hoàn thành! 🎉";
-      }
-    );
   },
 
   showRandomPrompt() {

@@ -51,11 +51,43 @@ const AudioManager = {
   },
 
   playBlob(blob) {
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
+    if (this.activeAudio) {
+      this.activeAudio.pause();
+      this.activeAudio = null;
+    }
+    if (this.activeObjectUrl) {
+      URL.revokeObjectURL(this.activeObjectUrl);
+      this.activeObjectUrl = null;
+    }
+    this.activeObjectUrl = URL.createObjectURL(blob);
+    const audio = new Audio(this.activeObjectUrl);
+    this.activeAudio = audio;
     audio.play();
-    audio.onended = () => URL.revokeObjectURL(url);
+    audio.onended = () => {
+      URL.revokeObjectURL(this.activeObjectUrl);
+      this.activeObjectUrl = null;
+      this.activeAudio = null;
+    };
     return audio;
+  },
+
+  createPlaybackUrl(blob) {
+    return URL.createObjectURL(blob);
+  },
+
+  revokePlaybackUrl(url) {
+    if (url) URL.revokeObjectURL(url);
+  },
+
+  stopPlayback() {
+    if (this.activeAudio) {
+      this.activeAudio.pause();
+      this.activeAudio = null;
+    }
+    if (this.activeObjectUrl) {
+      URL.revokeObjectURL(this.activeObjectUrl);
+      this.activeObjectUrl = null;
+    }
   },
 
   startShadowingTimer(durationSec, onTick, onComplete) {
