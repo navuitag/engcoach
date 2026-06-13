@@ -34,5 +34,9 @@ function renderAuthorCard() {
     </article>`;
 }
 
-return { AUTHOR, renderAppFooter, renderAuthorCard };
+function renderSidebar() {
+  return `<p class="sidebar-author"><strong>${AUTHOR.name}</strong><a href="mailto:${AUTHOR.email}">${AUTHOR.email}</a><br><a href="tel:${AUTHOR.phoneTel}">${AUTHOR.phone}</a></p>`;
+}
+
+return { AUTHOR, renderAppFooter, renderAuthorCard, renderSidebar };
 })();
