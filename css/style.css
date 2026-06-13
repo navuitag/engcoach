@@ -1481,3 +1481,79 @@ textarea:focus,
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+
+.lesson-practice-card {
+  border: 1px solid var(--indigo-100);
+  background: linear-gradient(180deg, var(--indigo-50) 0%, #fff 100%);
+}
+
+.lesson-practice-lead {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.lesson-practice-grid {
+  display: grid;
+  gap: 0.625rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lesson-practice-btn {
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.875rem;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lesson-practice-btn:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.lesson-practice-btn strong {
+  font-size: 0.925rem;
+}
+
+.lesson-practice-btn span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.recording-panel--compact .speaking-timer-actions {
+  margin-top: 0.75rem;
+}
+
+.recording-panel--compact .recording-history {
+  margin-top: 1rem;
+}
+
+.recording-history-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.speaking-timer-actions--compact .timer-display {
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .lesson-practice-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

@@ -8,6 +8,7 @@ const App = {
 
   shadowingAutoRecord: false,
   _latestPlaybackUrl: null,
+  _latestRecordingBlob: null,
 
   init() {
     this.mainEl = document.getElementById("main-content");
@@ -40,6 +41,20 @@ const App = {
         e.preventDefault();
         Router.go(el.getAttribute("data-nav"));
       });
+    });
+
+    this.mainEl.addEventListener("click", (e) => {
+      const actionEl = e.target.closest("[data-action]");
+      if (actionEl && this.mainEl.contains(actionEl)) {
+        e.preventDefault();
+        this.handleAction(actionEl.getAttribute("data-action"), actionEl);
+        return;
+      }
+      const routeEl = e.target.closest("[data-route]");
+      if (routeEl && this.mainEl.contains(routeEl)) {
+        e.preventDefault();
+        Router.go(routeEl.getAttribute("data-route"));
+      }
     });
 
     window.addEventListener("scroll", () => {
@@ -108,15 +123,9 @@ const App = {
   },
 
   bindEvents() {
-    this.mainEl.querySelectorAll("[data-action]").forEach((el) => {
-      const action = el.getAttribute("data-action");
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        this.handleAction(action, el);
-      });
-    });
-
     this.mainEl.querySelectorAll("[data-check]").forEach((el) => {
+      if (el.dataset.checkBound === "true") return;
+      el.dataset.checkBound = "true";
       el.addEventListener("change", () => {
         const [day, sessionId] = el.getAttribute("data-check").split("|");
         Storage.toggleSessionCheck(Number(day), sessionId);
@@ -124,14 +133,24 @@ const App = {
       });
     });
 
-    this.mainEl.querySelectorAll("[data-route]").forEach((el) => {
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        Router.go(el.getAttribute("data-route"));
+    this.mainEl.querySelectorAll(".day-btn").forEach((btn) => {
+      if (btn.dataset.dayBound === "true") return;
+      btn.dataset.dayBound = "true";
+      btn.addEventListener("click", () => {
+        const day = Number(btn.dataset.day);
+        ProgressManager.setCurrentDay(day);
+        Router.go("today");
       });
     });
 
-    this.mainEl.querySelectorAll("[data-play-recording]").forEach((el) => {
+    this.bindRecordingList(this.mainEl);
+  },
+
+  bindRecordingList(root = this.mainEl) {
+    if (!root) return;
+    root.querySelectorAll("[data-play-recording]").forEach((el) => {
+      if (el.dataset.playBound === "true") return;
+      el.dataset.playBound = "true";
       el.addEventListener("click", async () => {
         const id = Number(el.getAttribute("data-play-recording"));
         const recordings = await Storage.getRecordings();
@@ -139,21 +158,14 @@ const App = {
         if (rec?.blob) AudioManager.playBlob(rec.blob);
       });
     });
-
-    this.mainEl.querySelectorAll("[data-delete-recording]").forEach((el) => {
+    root.querySelectorAll("[data-delete-recording]").forEach((el) => {
+      if (el.dataset.deleteBound === "true") return;
+      el.dataset.deleteBound = "true";
       el.addEventListener("click", async () => {
         const id = Number(el.getAttribute("data-delete-recording"));
         if (!window.confirm("Xóa bản ghi âm này?")) return;
         await Storage.deleteRecording(id);
         await this.refreshSpeakingRecordings();
-      });
-    });
-
-    this.mainEl.querySelectorAll(".day-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const day = Number(btn.dataset.day);
-        ProgressManager.setCurrentDay(day);
-        Router.go("today");
       });
     });
   },
@@ -167,8 +179,8 @@ const App = {
         if (day < 60) ProgressManager.setCurrentDay(day + 1);
         FlashcardManager.addCardsFromLesson(ProgressManager.getLesson(day));
         ProgressManager.logStudySession(90);
-        alert(`Chúc mừng! Bạn đã hoàn thành Ngày ${day}!`);
-        Router.go("dashboard");
+        alert(`Chúc mừng! Bạn đã hoàn thành Ngày ${day}! Hãy luyện tập từ vựng và ghi âm speaking bên dưới.`);
+        Router.go("today");
       },
       "flip-card": () => this.flipFlashcard(),
       "rate-hard": () => this.rateFlashcard(1),
@@ -186,6 +198,29 @@ const App = {
         const n = FlashcardManager.addCardsFromLesson(ProgressManager.getLesson(day));
         alert(`Đã thêm ${n} từ từ bài học ngày ${day}`);
         Router.go("vocabulary");
+      },
+      "lesson-flashcard": () => {
+        const day = ProgressManager.getCurrentDay();
+        const n = FlashcardManager.addCardsFromLesson(ProgressManager.getLesson(day));
+        if (n) alert(`Đã thêm ${n} từ mới vào bộ flashcard.`);
+        Router.go("vocabulary");
+      },
+      "lesson-quiz": () => {
+        const day = ProgressManager.getCurrentDay();
+        FlashcardManager.addCardsFromLesson(ProgressManager.getLesson(day));
+        Router.go("vocabulary");
+        setTimeout(() => this.startQuiz(), 100);
+      },
+      "scroll-speaking-rec": () => {
+        const panel = document.getElementById("today-recording-panel");
+        if (panel) {
+          panel.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          Router.go("speaking");
+        }
+      },
+      "replay-latest-recording": () => {
+        if (this._latestRecordingBlob) AudioManager.playBlob(this._latestRecordingBlob);
       }
     };
     if (handlers[action]) handlers[action]();
@@ -194,6 +229,84 @@ const App = {
   skillBadge(skill) {
     const cls = skill.toLowerCase().replace(/\s*\+\s*/g, "-").replace(/\s+/g, "-");
     return `<span class="badge skill-${cls}">${Utils.escapeHTML(skill)}</span>`;
+  },
+
+  renderRecordingPanel({ panelId = "today-recording-panel", showHistory = true, compact = false } = {}) {
+    return `
+      <div class="recording-panel${compact ? " recording-panel--compact" : ""}" id="${panelId}">
+        <p class="speaking-rec-hint">Cho phép microphone khi trình duyệt hỏi. Ghi âm shadowing sẽ tự bật khi bạn bấm timer.</p>
+        <p id="rec-status" class="rec-status">Sẵn sàng ghi âm</p>
+        <div id="rec-playback" class="rec-playback" hidden></div>
+        <button class="btn btn-primary btn-block" id="rec-btn" type="button" data-action="start-recording">● Bắt đầu ghi âm</button>
+        <div class="speaking-timer-actions${compact ? " speaking-timer-actions--compact" : ""}">
+          <div class="timer-display" id="speak-timer">3:00</div>
+          <button class="btn btn-secondary" type="button" data-action="start-shadowing">Shadowing 3 phút</button>
+          <button class="btn btn-outline" type="button" data-action="stop-shadowing">Dừng</button>
+        </div>
+        ${showHistory ? `
+          <div class="recording-history">
+            <p class="recording-history-title">Nghe lại bản ghi</p>
+            <div id="speaking-recordings" class="recording-list">
+              <p class="empty-state">Đang tải bản ghi...</p>
+            </div>
+          </div>` : ""}
+      </div>`;
+  },
+
+  renderLessonPracticeCard(day, lesson) {
+    const vocabCount = (lesson?.sessions || []).reduce((sum, s) => sum + (s.vocab?.length || 0), 0);
+    const hasSpeaking = (lesson?.sessions || []).some((s) => s.skill?.includes("Speaking"));
+    return `
+      <div class="card lesson-practice-card" id="lesson-practice">
+        <div class="card-title">🎯 Luyện tập sau bài học</div>
+        <p class="lesson-practice-lead">Củng cố ngày ${day}: flashcard, quiz, ghi âm speaking và viết journal.</p>
+        <div class="lesson-practice-grid">
+          <button type="button" class="lesson-practice-btn" data-action="lesson-flashcard">
+            <strong>🃏 Flashcard</strong>
+            <span>${vocabCount || lesson?.dailyVocabCount || 12} từ</span>
+          </button>
+          <button type="button" class="lesson-practice-btn" data-action="lesson-quiz">
+            <strong>🎯 Quiz</strong>
+            <span>5 câu nhanh</span>
+          </button>
+          ${hasSpeaking ? `
+          <button type="button" class="lesson-practice-btn" data-action="scroll-speaking-rec">
+            <strong>🎙️ Ghi âm</strong>
+            <span>Luyện nói</span>
+          </button>` : `
+          <button type="button" class="lesson-practice-btn" data-route="speaking">
+            <strong>🎙️ Speaking</strong>
+            <span>Luyện nói</span>
+          </button>`}
+          <button type="button" class="lesson-practice-btn" data-route="writing">
+            <strong>✍️ Viết</strong>
+            <span>Journal</span>
+          </button>
+          <button type="button" class="lesson-practice-btn" data-route="grammar">
+            <strong>📝 Ngữ pháp</strong>
+            <span>Ôn cấu trúc</span>
+          </button>
+          <button type="button" class="lesson-practice-btn" data-route="review">
+            <strong>🔁 Ôn tập</strong>
+            <span>Tổng hợp</span>
+          </button>
+        </div>
+      </div>`;
+  },
+
+  renderSessionActions(session) {
+    const actions = [];
+    if (session.skill?.includes("Speaking")) {
+      actions.push(`<button type="button" class="btn btn-secondary btn-sm" data-action="scroll-speaking-rec">🎙️ Ghi âm</button>`);
+    }
+    if (session.skill?.includes("Vocabulary") || session.vocab?.length) {
+      actions.push(`<button type="button" class="btn btn-secondary btn-sm" data-action="lesson-flashcard">🃏 Luyện từ</button>`);
+    }
+    if (session.skill?.includes("Reading") || session.skill?.includes("Writing")) {
+      actions.push(`<button type="button" class="btn btn-secondary btn-sm" data-route="writing">✍️ Viết</button>`);
+    }
+    if (!actions.length) return "";
+    return `<div class="session-actions">${actions.join("")}</div>`;
   },
 
   renderSession(session, day) {
@@ -250,6 +363,7 @@ const App = {
             ${prompts}
             ${reviewTopics}
             ${session.task ? `<p class="session-task"><strong>Nhiệm vụ:</strong> ${Utils.escapeHTML(session.task)}</p>` : ""}
+            ${this.renderSessionActions(session)}
           </div>
         </label>
       </div>
@@ -390,6 +504,13 @@ const App = {
         </div>
       </div>
 
+      ${this.renderLessonPracticeCard(day, lesson)}
+
+      <div class="card" id="today-recording-panel">
+        <div class="card-title">🎙️ Ghi âm & luyện nói</div>
+        ${this.renderRecordingPanel({ panelId: "today-recording-panel-inner", showHistory: true, compact: true })}
+      </div>
+
       ${immersionHtml ? `<div class="card"><div class="card-title">Immersion hôm nay</div><ul class="immersion-list">${immersionHtml}</ul></div>` : ""}
 
       <div class="card">
@@ -397,6 +518,7 @@ const App = {
         <div class="day-picker">${dayPicker}</div>
       </div>
     `);
+    this.refreshSpeakingRecordings();
   },
 
   renderLibrary() {
@@ -837,28 +959,11 @@ const App = {
         ${promptsHtml}
       </div>
       <div class="card">
-        <div class="card-title">🎙️ Ghi âm giọng nói</div>
-        <p class="speaking-rec-hint">Ứng dụng sẽ xin quyền microphone. Ghi âm tự động khi bạn bắt đầu shadowing, hoặc bấm nút bên dưới.</p>
-        <p id="rec-status" class="rec-status">Sẵn sàng ghi âm</p>
-        <div id="rec-playback" class="rec-playback" hidden></div>
-        <button class="btn btn-primary btn-block" id="rec-btn" data-action="start-recording">● Bắt đầu ghi âm</button>
-      </div>
-      <div class="card">
-        <div class="card-title">⏱️ Shadowing Timer</div>
-        <p class="speaking-rec-hint">Bắt đầu timer sẽ tự động ghi âm để bạn nghe lại sau khi luyện.</p>
-        <div class="timer-display" id="speak-timer">3:00</div>
-        <div class="speaking-timer-actions">
-          <button class="btn btn-primary" data-action="start-shadowing">Bắt đầu shadowing 3 phút</button>
-          <button class="btn btn-outline" data-action="stop-shadowing">Dừng</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">🔊 Nghe lại bản ghi</div>
-        <div id="speaking-recordings" class="recording-list">
-          <p class="empty-state">Đang tải bản ghi...</p>
-        </div>
+        <div class="card-title">🎙️ Ghi âm & shadowing</div>
+        ${this.renderRecordingPanel({ panelId: "speaking-recording-panel", showHistory: true })}
       </div>
       <button class="btn btn-secondary btn-block" data-route="immersion">💬 Self-talk prompts</button>
+      <button class="btn btn-outline btn-block" data-route="today">← Về bài học hôm nay</button>
     `);
     this.refreshSpeakingRecordings();
   },
@@ -891,10 +996,11 @@ const App = {
     const recordings = await Storage.getRecordings();
     recordings.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     listEl.innerHTML = this.renderRecordingsList(recordings.slice(0, 12));
-    this.bindEvents();
+    this.bindRecordingList(this.mainEl);
   },
 
   showRecordingPlayback(blob, label) {
+    this._latestRecordingBlob = blob;
     const el = document.getElementById("rec-playback");
     if (!el || !blob) return;
     if (this._latestPlaybackUrl) {
