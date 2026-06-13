@@ -1,4 +1,4 @@
-const CACHE_NAME = "engcoach-v$(( $(echo 11) + 1 ))";
+const CACHE_NAME = "engcoach-v12";
 const ASSETS = [
   "./",
   "./index.html",
